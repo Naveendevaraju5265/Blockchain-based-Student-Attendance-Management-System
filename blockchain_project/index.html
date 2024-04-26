@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <title>Student Attendance System</title>
+
+</head>
+<body>
+
+<div class="Home-form">
+  <h1>Student Attendance System</h1>
+  <div class="Home-form-btn">
+    <button onclick="redirectStudent()" style="width: 50%;">Student</button>
+  </div>
+  <div class="Home-form-btn">
+    <button onclick="redirectTeacher()" style="width: 50%;">Teacher</button>
+  </div>
+</div>
+
+<!-- JavaScript to redirect to respective pages -->
+<script>
+  function redirectStudent() {
+	window.location.href = 'student.html';
+  }
+
+  function redirectTeacher() {
+	window.location.href = 'teacher.html';
+  }
+</script>
+</body>
+</html>

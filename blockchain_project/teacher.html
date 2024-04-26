@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Page</title>
+    <link rel="stylesheet" href="teacher.css">
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+  <script>
+    // Define the contract ABI (replace this with your actual ABI)
+    const abi = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			},
+			{
+				"name": "_age",
+				"type": "uint256"
+			},
+			{
+				"name": "_fName",
+				"type": "string"
+			},
+			{
+				"name": "_lName",
+				"type": "string"
+			}
+		],
+		"name": "createStudent",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			}
+		],
+		"name": "decrementAttendance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			},
+			{
+				"name": "_present",
+				"type": "uint256"
+			},
+			{
+				"name": "_NClasses",
+				"type": "uint256"
+			}
+		],
+		"name": "incrementAttendance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "fName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "lName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "age",
+				"type": "uint256"
+			}
+		],
+		"name": "StudentCreationEvent",
+		"type": "event"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "countStudents",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			}
+		],
+		"name": "getParticularStudent",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getstudentDetails",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "studentSRNs",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    // Define the contract address on Sepholia network
+    const contractAddress = '0xb7859f9aa903127a587fb264052698711fdbf21e';
+
+    // Create a new instance of the contract
+    const contractInstance = new web3.eth.Contract(abi, contractAddress);
+    console.log('Contract instance created:', contractInstance);
+
+    // Function to create a new student
+    async function createStudent() {
+      console.log('Creating a new student...');
+      try {
+        var age =  document.getElementById('createStudentAge').value;
+		var fName = document.getElementById("createStudentfName").value;
+        var lName = document.getElementById("createStudentlName").value;
+        var srn = document.getElementById("createStudentsrn").value;
+        // Send transaction to create student
+        const accounts = await web3.eth.getAccounts();
+        console.log('Sending transaction from account:', accounts[0]);
+        const result = await contractInstance.methods.createStudent(srn, age, fName, lName).send({ from: accounts[0] });
+        console.log("Student created successfully:", result);
+		document.getElementById('createStudentDetails').style.display = 'none';
+      } catch (error) {
+        console.error("Error creating student:", error);
+      }
+    }
+
+
+	async function markAttendance() {
+		console.log('Marking Attendance started');
+		try{
+			var srn = document.getElementById("putAttendanceSrn").value;
+			var Present = document.getElementById("PresenstSrn").value;
+			var NClasses = document.getElementById("NclassesSrn").value; 
+			console.log(srn,Present,NClasses)
+			const accounts = await web3.eth.getAccounts();
+        	console.log('Sending transaction from account:', accounts[0]);
+			const result = await contractInstance.methods.incrementAttendance(srn, Present, NClasses).send({ from: accounts[0] });
+			console.log("Marked attendance successully:", result);
+      } catch (error) {
+        console.error("Error marking student:", error);
+      }
+	}
+
+	async function decrementAttendance() {
+		console.log('Marking Attendance started');
+		try{
+			var srn = document.getElementById("decrementAttendanceSrn").value;
+			const accounts = await web3.eth.getAccounts();
+        	console.log('Sending transaction from account:', accounts[0]);
+			const result = await contractInstance.methods.decrementAttendance(srn).send({ from: accounts[0] });
+			console.log("Decremented attendance successully:", result);
+      } catch (error) {
+        console.error("Error decrementing student:", error);
+      }
+	}
+
+	async function DisplayAttend() {
+    console.log('Getting student details started');
+    try {
+        var srn = document.getElementById("displayAttendanceSrn").value;
+        const accounts = await web3.eth.getAccounts();
+        console.log('Sending transaction from account:', accounts[1]);
+        const result = await contractInstance.methods.getParticularStudent(srn).call();
+        console.log("Got student details successfully:", result);
+        
+        // Construct the message with returned values
+        var message = "First Name: " + result[0] + "\n" +
+                      "Last Name: " + result[1] + "\n" +
+                      "Age: " + result[2] + "\n" +
+                      "No of classes Present: " + result[3] + "\n" + 
+					  "Total No of classes: " + result[4] + "\n" + 
+					  "Percentage: " + result[3]/result[4] ;
+		showPopup(message);
+    } catch (error) {
+        console.error("Error getting student details:", error);
+    }
+}
+
+  </script>
+		<div class="display-container">
+		<h2>Teacher Page</h2>
+
+		
+		<div class="display-container-btn">
+			<button id="createStudentBtn" class="popup-btn" style="width: 6.5cm;">Create Student Information</button>
+		</div>
+
+		<div class="display-container-btn">
+			<button id="putAttendanceBtn" class="popup-btn" style="width: 6.5cm;">Put Attendance</button>
+		</div>
+
+		<div class="display-container-btn">
+			<button id="decrementAttendanceBtn" class="popup-btn" style="width: 6.5cm;">Decrement Attendance</button>
+		</div>
+
+		<div class="display-container-btn">
+			<button id="displayAttendanceBtn" class="popup-btn" style="width: 6.5cm;">Student Details</button>
+		</div>
+
+		<div class="display-container-btn">
+			<button id="AllStudentsBtn" class="popup-btn" style="width: 6.5cm;">All Students details</button>
+		</div>
+
+		<br><br>
+
+		<div id="createStudentDetails" style="display: none;">
+			<h2>Create Student Information</h2>
+			<form id="createStudentForm">
+				<label for="createStudentAge">Age:</label>
+				<input type="number" id="createStudentAge" style="width: 85%;"><br>
+				<label for="createStudentfName">First Name:</label>
+				<input type="text" id="createStudentfName" style="width: 85%;"><br>
+				<label for="createStudentlName">Last Name:</label>
+				<input type="text" id="createStudentlName" style="width: 85%;"><br>
+				<label for="createStudentsrn">SRN:</label>
+				<input type="text" id="createStudentsrn" style="width: 85%;"><br>
+				<button type="button" onclick="createStudent()">Create Student</button>
+			</form>
+		</div>
+
+		<div id="putAttendanceDetails" style="display: none;">
+			<h2>Put Attendance</h2>
+			<form id="putAttendanceForm">
+				<label for="putAttendanceSrn">Enter SRN:</label>
+				<input type="text" id="putAttendanceSrn" style="width: 85%;"><br>
+				<label for="PresentSrn">No of class present:</label>
+				<input type="number" id="PresenstSrn" style="width: 85%;"><br>
+				<label for="NclassesSrn">No of classes:</label>
+				<input type="number" id="NclassesSrn" style="width: 85%;"><br>
+				<button type="button" onclick="markAttendance()">Submit Attendance</button>
+			</form>
+		</div>
+
+		<div id="decrementAttendanceDetails" style="display: none;">
+			<h2>Decrement Attendance</h2>
+			<form id="decrementAttendanceForm">
+				<label for="decrementAttendanceSrn">Enter SRN:</label>
+				<input type="text" id="decrementAttendanceSrn" style="width: 85%;"><br>
+				<button type="button" onclick="decrementAttendance()">Submit Attendance</button>
+			</form>
+		</div>
+
+		
+
+		<div id="displayAttendanceDetails" style="display: none;">
+			<h2>Display Attendance</h2>
+			<form id="displayAttendanceForm">
+				<label for="displayAttendanceSrn">Enter SRN:</label>
+				<input type="text" id="displayAttendanceSrn" style="width: 85%;"><br>
+				<button type="button" onclick="DisplayAttend()">Display Attendance</button>
+			</form>
+		</div>
+
+		<div id="popup" class="popup">
+			<div class="popup-content">
+				<!-- Message content goes here -->
+				<p id="message"></p>
+				<div >
+					<button id="closePopup" class="Close-popup-btn" >OK</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="studentDetails" style="display: none;"></div>
+
+	</div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="teacher.js"></script>
+</body>
+</html>

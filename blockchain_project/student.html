@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details and Attendance</title>
+    <script src="student.js"></script>
+    <link rel="stylesheet" href="student.css">
+   
+</head>
+<body>
+    
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+  <script>
+
+    // Define the contract ABI (replace this with your actual ABI)
+    const abi = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			},
+			{
+				"name": "_age",
+				"type": "uint256"
+			},
+			{
+				"name": "_fName",
+				"type": "string"
+			},
+			{
+				"name": "_lName",
+				"type": "string"
+			}
+		],
+		"name": "createStudent",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			}
+		],
+		"name": "decrementAttendance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			},
+			{
+				"name": "_present",
+				"type": "uint256"
+			},
+			{
+				"name": "_NClasses",
+				"type": "uint256"
+			}
+		],
+		"name": "incrementAttendance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "fName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "lName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "age",
+				"type": "uint256"
+			}
+		],
+		"name": "StudentCreationEvent",
+		"type": "event"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "countStudents",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_srn",
+				"type": "string"
+			}
+		],
+		"name": "getParticularStudent",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getstudentDetails",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "studentSRNs",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+	function showPopup(message) {
+    document.getElementById('message').innerText = message;
+    document.getElementById('popup').style.display = 'block';
+	}
+
+    // Define the contract address on Sepholia network
+    const contractAddress = '0xb7859f9aa903127a587fb264052698711fdbf21e';
+
+    // Create a new instance of the contract
+    const contractInstance = new web3.eth.Contract(abi, contractAddress);
+    console.log('Contract instance created:', contractInstance);
+
+
+	async function markAttendance() {
+		console.log('Marking Attendance started');
+		try{
+			var srn = document.getElementById("attendanceSrn").value;
+			const accounts = await web3.eth.getAccounts();
+        	console.log('Sending transaction from account:', accounts[0]);
+			const result = await contractInstance.methods.incrementAttendance(srn).send({ from: accounts[0] });
+			console.log("Marked attendance successully:", result);
+      } catch (error) {
+        console.error("Error marking student:", error);
+      }
+	}
+
+	async function DisplayAttend() {
+    console.log('Getting student details started');
+    try {
+        var srn = document.getElementById("displayAttendanceSrn").value;
+        const accounts = await web3.eth.getAccounts();
+        console.log('Sending transaction from account:', accounts[0]);
+        const result = await contractInstance.methods.getParticularStudent(srn).call();
+        console.log("Got student details successfully:", result);
+        // Construct the message with returned values
+        var message = "First Name: " + result[0] + "\n" +
+                      "Last Name: " + result[1] + "\n" +
+                      "Age: " + result[2] + "\n" +
+                      "Attendance Value: " + result[3];
+		showPopup(message);
+        
+        // Show a popup with the messagena 
+    } catch (error) {
+        console.error("Error getting student details:", error);
+    }
+}
+
+  </script>
+
+
+    <!-- <input type="radio" id="createRadio" name="operationRadio" value="create" checked>
+    <label for="createRadio">Create New Student</label> -->
+	<div class="display-container">
+		<h2>Student Details and Attendance</h2>
+	
+		<div class="display-container-btn">
+			<button id="putAttendanceBtn" class="popup-btn">Put Attendance</button>
+		</div>
+	
+		<div class="display-container-btn">
+			<button id="displayAttendanceBtn" class="popup-btn">Display Attendance</button>
+		</div>
+	
+		<div id="attendanceDetails" style="display: none;">
+			<h2>Put Attendance</h2>
+			<form id="attendanceForm">
+				<label for="attendanceSrn">Enter SRN:</label>
+				<input type="text" id="attendanceSrn" ><br>
+				<button type="button" onclick="markAttendance()">Submit Attendance</button>
+			</form>
+		</div>
+	
+		<div id="displayAttendanceDetails" style="display: none;">
+			<h2>Display Attendance</h2>
+			<form id="displayAttendanceForm">
+				<label for="displayAttendanceSrn">Enter SRN:</label>
+				<input type="text" id="displayAttendanceSrn" ><br>
+				<button type="button" onclick="DisplayAttend()">Display Attendance</button>
+			</form>
+		</div>
+	
+		<div id="popup" class="popup" style="display : none">
+			<div class="popup-content">
+				<p id="message"></p>
+				<div >
+					<button id="closePopup" class="Close-popup-btn" >OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <script src="student.js"></script>
+</body>
+</html>
